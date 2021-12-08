@@ -9,7 +9,6 @@ import math
 from typing import Optional, Tuple
 from omegaconf import II
 import sys
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -615,9 +614,9 @@ class Wav2VecPredictionsModel(nn.Module):
                 predictions[start:end] = torch.einsum(
                     "bct,nbct->nbt", x[..., :-offset, i], targets[..., offset:]
                 ).flatten()
-                labels[start : start + pos_num] = 1.0
+                labels[start: start + pos_num] = 1.0
                 if weights is not None:
-                    weights[start : start + pos_num] = 1.0
+                    weights[start: start + pos_num] = 1.0
             start = end
         assert end == predictions.numel(), "{} != {}".format(end, predictions.numel())
 

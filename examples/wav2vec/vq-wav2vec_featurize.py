@@ -116,7 +116,7 @@ class DatasetWriter:
             assert len(files) > 0
 
             if self.args.shard is not None:
-                files = files[self.args.shard :: self.args.num_shards]
+                files = files[self.args.shard:: self.args.num_shards]
 
             lbls = []
             with open(self.data_file(split), "w") as srcf:
