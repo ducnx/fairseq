@@ -325,9 +325,7 @@ def batch_by_size(
         )
 
     # added int() to avoid TypeError: an integer is required
-    max_tokens = (
-        int(max_tokens) if max_tokens is not None else -1
-    )
+    max_tokens = int(max_tokens) if max_tokens is not None else -1
     max_sentences = max_sentences if max_sentences is not None else -1
     bsz_mult = required_batch_size_multiple
 
@@ -376,8 +374,9 @@ def post_process(sentence: str, symbol: str):
         sentence = sentence.replace(" ", "").replace("|", " ").strip()
     elif symbol == "silence":
         import re
+
         sentence = sentence.replace("<SIL>", "")
-        sentence = re.sub(' +', ' ', sentence).strip()
+        sentence = re.sub(" +", " ", sentence).strip()
     elif symbol == "_EOW":
         sentence = sentence.replace(" ", "").replace("_EOW", " ").strip()
     elif symbol in {"subword_nmt", "@@ ", "@@"}:
@@ -548,7 +547,7 @@ def get_buckets(sizes, num_buckets):
         np.percentile(
             sizes,
             np.linspace(0, 100, num_buckets + 1),
-            interpolation='lower',
+            interpolation="lower",
         )[1:]
     )
     return buckets
