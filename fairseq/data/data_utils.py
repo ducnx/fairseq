@@ -66,8 +66,9 @@ def collate_tokens(
             dst.copy_(src)
 
     for i, v in enumerate(values):
-        copy_tensor(v, res[i][size - len(v) :] if left_pad else res[i][: len(v)])
+        copy_tensor(v, res[i][size - len(v):] if left_pad else res[i][: len(v)])
     return res
+
 
 def load_indexed_dataset(
     path, dictionary=None, dataset_impl=None, combine=False, default="cached"
@@ -405,7 +406,7 @@ def compute_mask_indices(
     Computes random mask spans for a given shape
 
     Args:
-        shape: the the shape for which to compute masks.
+        shape: the shape for which to compute masks.
             should be of size 2 where first element is batch size and 2nd is timesteps
         padding_mask: optional padding mask of the same size as shape, which will prevent masking padded elements
         mask_prob: probability for each token to be chosen as start of the span to be masked. this will be multiplied by
@@ -562,7 +563,6 @@ def get_bucketed_sizes(orig_sizes, buckets):
         sizes[mask] = end_val
         start_val = end_val
     return sizes
-
 
 
 def _find_extra_valid_paths(dataset_path: str) -> set:

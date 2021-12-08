@@ -95,7 +95,6 @@ class FairseqDataclass:
             return config
 
 
-
 @dataclass
 class CommonConfig(FairseqDataclass):
     # This is the core dataclass including common parameters shared by all different jobs. Please append your params to other dataclasses if they were
@@ -125,6 +124,10 @@ class CommonConfig(FairseqDataclass):
     wandb_project: Optional[str] = field(
         default=None,
         metadata={"help": "Weights and Biases project name to use for logging"},
+    )
+    wandb_run_name: Optional[str] = field(
+        default=None,
+        metadata={'help': 'WandB run name'}
     )
     azureml_logging: Optional[bool] = field(
         default=False, metadata={"help": "Log scalars to AzureML context"},
@@ -1003,16 +1006,16 @@ class EMAConfig(FairseqDataclass):
             "help": 'decay for exponential moving average model'
         }
     )
-    ema_start_update : int = field(
+    ema_start_update: int = field(
         default=0, metadata={"help": "start EMA update after this many model updates"}
     )
-    ema_seed_model : Optional[str] = field(
+    ema_seed_model: Optional[str] = field(
         default=None, metadata={
             "help": "Seed to load EMA model from. "
             "Used to load EMA model separately from the actual model."
         }
     )
-    ema_update_freq : int = field(
+    ema_update_freq: int = field(
         default=1, metadata={"help": "Do EMA update every this many model updates"}
     )
     ema_fp32: bool = field(

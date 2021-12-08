@@ -366,6 +366,7 @@ def call_main(cfg: FairseqConfig, main, **kwargs):
         )
     else:
         # single GPU main
+        torch.multiprocessing.set_sharing_strategy('file_system')
         main(cfg, **kwargs)
 
 
@@ -601,7 +602,7 @@ def all_gather_list(data, group=None, max_size=16384):
     header = struct.pack(">I", enc_size)
     cpu_buffer[:size] = torch.ByteTensor(list(header + enc))
     start = rank * max_size
-    buffer[start : start + size].copy_(cpu_buffer[:size])
+    buffer[start: start + size].copy_(cpu_buffer[:size])
 
     all_reduce(buffer, group=group)
 
@@ -609,12 +610,12 @@ def all_gather_list(data, group=None, max_size=16384):
     try:
         result = []
         for i in range(world_size):
-            out_buffer = buffer[i * max_size : (i + 1) * max_size]
+            out_buffer = buffer[i * max_size: (i + 1) * max_size]
             (enc_size,) = struct.unpack(">I", bytes(out_buffer[:header_size].tolist()))
             if enc_size > 0:
                 result.append(
                     pickle.loads(
-                        bytes(out_buffer[header_size : header_size + enc_size].tolist())
+                        bytes(out_buffer[header_size: header_size + enc_size].tolist())
                     )
                 )
         return result

@@ -7,6 +7,25 @@
 Train a new model on one or across multiple GPUs.
 """
 
+from omegaconf import DictConfig, OmegaConf
+from fairseq.trainer import Trainer
+from fairseq.model_parallel.megatron_trainer import MegatronTrainer
+from fairseq.logging import meters, metrics, progress_bar
+from fairseq.file_io import PathManager
+from fairseq.distributed import fsdp_enable_wrap, fsdp_wrap, utils as distributed_utils
+from fairseq.dataclass.utils import convert_namespace_to_omegaconf
+from fairseq.dataclass.configs import FairseqConfig
+from fairseq.data.plasma_utils import PlasmaStore
+from fairseq.data import iterators, data_utils
+from fairseq import (
+    checkpoint_utils,
+    options,
+    quantization_utils,
+    tasks,
+    utils,
+)
+import torch
+import numpy as np
 import argparse
 import logging
 import math
@@ -22,28 +41,6 @@ logging.basicConfig(
     stream=sys.stdout,
 )
 logger = logging.getLogger("fairseq_cli.train")
-
-import numpy as np
-import torch
-from fairseq import (
-    checkpoint_utils,
-    options,
-    quantization_utils,
-    tasks,
-    utils,
-)
-from fairseq.data import iterators, data_utils
-from fairseq.data.plasma_utils import PlasmaStore
-from fairseq.dataclass.configs import FairseqConfig
-from fairseq.dataclass.utils import convert_namespace_to_omegaconf
-from fairseq.distributed import fsdp_enable_wrap, fsdp_wrap, utils as distributed_utils
-from fairseq.file_io import PathManager
-from fairseq.logging import meters, metrics, progress_bar
-from fairseq.model_parallel.megatron_trainer import MegatronTrainer
-from fairseq.trainer import Trainer
-from omegaconf import DictConfig, OmegaConf
-
-
 
 
 def main(cfg: FairseqConfig) -> None:
@@ -267,9 +264,12 @@ def train(
             if distributed_utils.is_master(cfg.distributed_training)
             else None
         ),
-        wandb_run_name=os.environ.get(
-            "WANDB_NAME", os.path.basename(cfg.checkpoint.save_dir)
+        wandb_run_name=(
+            cfg.common.wandb_run_name
         ),
+        # wandb_run_name=os.environ.get(
+        #     "WANDB_NAME", os.path.basename(cfg.checkpoint.save_dir)
+        # ),
         azureml_logging=(
             cfg.common.azureml_logging
             if distributed_utils.is_master(cfg.distributed_training)

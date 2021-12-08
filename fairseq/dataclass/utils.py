@@ -383,7 +383,6 @@ def convert_namespace_to_omegaconf(args: Namespace) -> DictConfig:
     config_path = os.path.join("..", "config")
 
     GlobalHydra.instance().clear()
-
     with initialize(config_path=config_path):
         try:
             composed_cfg = compose("config", overrides=overrides, strict=False)
